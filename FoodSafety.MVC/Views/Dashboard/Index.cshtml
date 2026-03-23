@@ -1,0 +1,84 @@
+﻿@model FoodSafety.MVC.ViewModels.DashboardViewModel
+
+@{
+    ViewData["Title"] = "Food Safety Dashboard";
+}
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1><i class="bi bi-graph-up"></i> Food Safety Dashboard</h1>
+        <span class="badge bg-secondary">Status: Live Data</span>
+    </div>
+
+    <div class="card mb-4 border-0 shadow-sm bg-light">
+        <div class="card-body">
+            <form asp-action="Index" method="get" class="row g-3 align-items-end">
+                <div class="col-md-5">
+                    <label class="form-label fw-bold">Filter by Town</label>
+                    <select name="town" class="form-select">
+                        <option value="">All Towns</option>
+                        @foreach (var t in Model.Towns)
+                        {
+                            @if (t == Model.SelectedTown)
+                            {
+                                <option value="@t" selected>@t</option>
+                            }
+                            else
+                            {
+                                <option value="@t">@t</option>
+                            }
+                        }
+                    </select>
+                </div>
+                <div class="col-md-4">
+                    <label class="form-label fw-bold">Filter by Risk Rating</label>
+                    <select name="risk" class="form-select" asp-items="Html.GetEnumSelectList<FoodSafety.Domain.Enums.RiskRating>()">
+                        <option value="">All Risk Levels</option>
+                    </select>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+                </div>
+                <div class="col-md-2">
+                    <a asp-action="Index" class="btn btn-outline-secondary w-100">Reset</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div class="row text-center">
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-header text-white fw-bold" style="background-color: #6f42c1;">Inspections This Month</div>
+                <div class="card-body border border-top-10" style="border-color: #6f42c1 !important;">
+                    <h2 class="display-4" style="color: #6f42c1;">@Model.MonthlyInspections</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 border-danger shadow-sm">
+                <div class="card-header bg-danger text-white">Failed Outcomes</div>
+                <div class="card-body text-danger">
+                    <h2 class="display-4">@Model.MonthlyFailures</h2>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-4 mb-4">
+            <div class="card h-100 shadow-sm border-0">
+                <div class="card-header bg-success text-white fw-bold">Overdue Follow-ups</div>
+                <div class="card-body border border-top-0 border-success">
+                    <h2 class="display-4">@Model.OverdueFollowUps</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="mt-5 p-3 bg-white border rounded shadow-sm">
+        <p class="mb-0 text-muted">
+            <i class="bi bi-info-circle"></i>
+            <strong>Audit Trail:</strong> All actions on this dashboard are being logged to <code>/Logs</code> via Serilog.
+        </p>
+    </div>
+</div>

@@ -1,0 +1,47 @@
+﻿@model IEnumerable<FoodSafety.Domain.Entities.Inspection>
+
+@{
+    ViewData["Title"] = "Inspections List";
+}
+
+
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1><i class="bi bi-list-check"></i> Inspections</h1>
+        <a asp-action="Create" class="btn btn-success"><i class="bi bi-plus-circle"></i> Create New Inspection</a>
+    </div>
+
+    <table class="table table-hover shadow-sm">
+        <thead class="table-dark">
+            <tr>
+                <th>Date</th>
+                <th>Premises</th>
+                <th>Score</th>
+                <th>Outcome</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@item.InspectionDate.ToShortDateString()</td>
+                    <td>@item.Premises.Name</td>
+                    <td>
+                        <span class="badge @(item.Score < 50 ? "bg-danger" : "bg-primary")">@item.Score</span>
+                    </td>
+                    <td>
+                        <span class="fw-bold @(item.Outcome.ToString() == "Pass" ? "text-success" : "text-danger")">
+                            @item.Outcome
+                        </span>
+                    </td>
+                    <td>
+                        <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-secondary">Edit</a>
+                        <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-outline-info">Details</a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>
