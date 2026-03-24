@@ -64,28 +64,31 @@ namespace FoodSafety.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PremisesId,InspectionDate,Score,Outcome,Notes")] Inspection inspection)
         {
-
-            if (inspection.InspectionDate > DateTime.Now)
+            using (Serilog.Context.LogContext.PushProperty("UserName", User.Identity?.Name))
             {
-                _logger.LogWarning("Invalid InspectionDate {Date} for Premises {Id}",
-            inspection.InspectionDate, inspection.PremisesId);
+
+                if (inspection.InspectionDate > DateTime.Now)
+                {
+                    _logger.LogWarning("Invalid InspectionDate {Date} for Premises {Id}",
+                inspection.InspectionDate, inspection.PremisesId);
+                    return View(inspection);
+                }
+
+                if (ModelState.IsValid)
+                {
+                    _context.Add(inspection);
+                    await _context.SaveChangesAsync();
+
+
+                    _logger.LogInformation("Inspection {InspId} created for Premises {PremId} by {User}",
+            inspection.Id, inspection.PremisesId, User.Identity.Name);
+
+                    return RedirectToAction(nameof(Index));
+                }
+
+                ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Name", inspection.PremisesId);
                 return View(inspection);
             }
-
-            if (ModelState.IsValid)
-            {
-                _context.Add(inspection);
-                await _context.SaveChangesAsync();
-
-
-                _logger.LogInformation("Inspection {InspId} created for Premises {PremId} by {User}",
-        inspection.Id, inspection.PremisesId, User.Identity.Name);
-
-                return RedirectToAction(nameof(Index));
-            }
-
-            ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Name", inspection.PremisesId);
-            return View(inspection);
         }
 
         // GET: Inspections/Edit/5
@@ -122,19 +125,17 @@ namespace FoodSafety.MVC.Controllers
                 {
                     _context.Update(inspection);
                     await _context.SaveChangesAsync();
+
+                    _logger.LogInformation("Inspection {Id} updated by {User}", id, User.Identity?.Name);
+
+                    return RedirectToAction(nameof(Index));
                 }
-                catch (DbUpdateConcurrencyException)
+                catch (DbUpdateConcurrencyException ex)
                 {
-                    if (!InspectionExists(inspection.Id))
-                    {
-                        return NotFound();
-                    }
-                    else
-                    {
-                        throw;
-                    }
+                    _logger.LogError(ex, "Concurrency error updating Inspection {Id}", id);
+                    throw;
                 }
-                return RedirectToAction(nameof(Index));
+                
             }
             ViewData["PremisesId"] = new SelectList(_context.Premises, "Id", "Address", inspection.PremisesId);
             return View(inspection);

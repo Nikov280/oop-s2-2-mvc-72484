@@ -55,40 +55,43 @@ namespace FoodSafety.MVC.Controllers
         [Authorize(Roles = "Inspector,Admin")]
         public async Task<IActionResult> Close(int id)
         {
-            try
+            using (Serilog.Context.LogContext.PushProperty("UserName", User.Identity?.Name))
             {
-                var followUp = await _context.FollowUps.FindAsync(id);
-                if (followUp == null)
+                try
                 {
-                    // LOG EVENT: Warning - Attempt to close non-existent record
-                    _logger.LogWarning("Failed to close Follow-up ID {Id}: Record not found.", id);
-                    return NotFound();
-                }
+                    var followUp = await _context.FollowUps.FindAsync(id);
+                    if (followUp == null)
+                    {
+                        // LOG EVENT: Warning - Attempt to close non-existent record
+                        _logger.LogWarning("Failed to close Follow-up ID {Id}: Record not found.", id);
+                        return NotFound();
+                    }
 
-                if (followUp.Status == "Closed")
+                    if (followUp.Status == "Closed")
+                    {
+                        _logger.LogWarning("Follow-up ID {Id} is already closed.", id);
+                        return BadRequest("Already closed.");
+                    }
+
+                    // Update status
+                    followUp.Status = "Closed";
+                    followUp.ClosedDate = DateTime.Now;
+
+                    _context.Update(followUp);
+                    await _context.SaveChangesAsync();
+
+                    // LOG EVENT: Information - Audit trail of closure
+                    _logger.LogInformation("Follow-up ID {Id} successfully CLOSED by user {User}",
+                        id, User.Identity?.Name);
+
+                    return RedirectToAction(nameof(Index));
+                }
+                catch (Exception ex)
                 {
-                    _logger.LogWarning("Follow-up ID {Id} is already closed.", id);
-                    return BadRequest("Already closed.");
+                    // LOG EVENT: Error - Exception handling
+                    _logger.LogError(ex, "An error occurred while closing Follow-up ID {Id}", id);
+                    return View("Error");
                 }
-
-                // Update status
-                followUp.Status = "Closed";
-                followUp.ClosedDate = DateTime.Now;
-
-                _context.Update(followUp);
-                await _context.SaveChangesAsync();
-
-                // LOG EVENT: Information - Audit trail of closure
-                _logger.LogInformation("Follow-up ID {Id} successfully CLOSED by user {User}",
-                    id, User.Identity?.Name);
-
-                return RedirectToAction(nameof(Index));
-            }
-            catch (Exception ex)
-            {
-                // LOG EVENT: Error - Exception handling
-                _logger.LogError(ex, "An error occurred while closing Follow-up ID {Id}", id);
-                return View("Error");
             }
         }
 
