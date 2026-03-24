@@ -64,11 +64,12 @@ namespace FoodSafety.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("PremisesId,InspectionDate,Score,Outcome,Notes")] Inspection inspection)
         {
-            
+
             if (inspection.InspectionDate > DateTime.Now)
             {
-                _logger.LogWarning("Validation Issue: Inspection date {Date} is in the future", inspection.InspectionDate);
-                ModelState.AddModelError("InspectionDate", "Date cannot be in the future");
+                _logger.LogWarning("Invalid InspectionDate {Date} for Premises {Id}",
+            inspection.InspectionDate, inspection.PremisesId);
+                return View(inspection);
             }
 
             if (ModelState.IsValid)
@@ -76,9 +77,9 @@ namespace FoodSafety.MVC.Controllers
                 _context.Add(inspection);
                 await _context.SaveChangesAsync();
 
-                
-                _logger.LogInformation("New Inspection created. ID: {Id}, Premises: {PremisesId}, Score: {Score}",
-                    inspection.Id, inspection.PremisesId, inspection.Score);
+
+                _logger.LogInformation("Inspection {InspId} created for Premises {PremId} by {User}",
+        inspection.Id, inspection.PremisesId, User.Identity.Name);
 
                 return RedirectToAction(nameof(Index));
             }
@@ -88,6 +89,7 @@ namespace FoodSafety.MVC.Controllers
         }
 
         // GET: Inspections/Edit/5
+        [HttpGet]
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null)
@@ -106,6 +108,7 @@ namespace FoodSafety.MVC.Controllers
 
         // POST: Inspections/Edit/5              
         [ValidateAntiForgeryToken]
+        [HttpPost]
         public async Task<IActionResult> Edit(int id, [Bind("Id,PremisesId,InspectionDate,Score,Outcome,Notes")] Inspection inspection)
         {
             if (id != inspection.Id)

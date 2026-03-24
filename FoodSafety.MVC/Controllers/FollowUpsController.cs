@@ -113,8 +113,20 @@ namespace FoodSafety.MVC.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("InspectionId,DueDate,Status")] FollowUp followUp)
         {
+            var inspection = await _context.Inspections.FindAsync(followUp.InspectionId);
+            if (inspection != null && followUp.DueDate < inspection.InspectionDate)
+            {
+                // LOG EVENT: Warning - Business Rule
+                _logger.LogWarning("Validation Issue: Follow-up DueDate {Due} is before InspectionDate {Insp} for Inspection {Id}",
+                    followUp.DueDate, inspection.InspectionDate, followUp.InspectionId);
+
+                ModelState.AddModelError("DueDate", "La fecha de vencimiento no puede ser anterior a la fecha de la inspección.");
+            }
+
             if (ModelState.IsValid)
             {
+                try 
+                {
                 
                 _context.Add(followUp);
                 await _context.SaveChangesAsync();
@@ -124,6 +136,21 @@ namespace FoodSafety.MVC.Controllers
 
                 return RedirectToAction(nameof(Index));
             }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex, "Database Error: Could not create Follow-up for Inspection {Id}", followUp.InspectionId);
+
+                    ModelState.AddModelError("", "Error saving data.");
+                }
+            }
+
+            var inspections = _context.Inspections
+        .Include(i => i.Premises)
+        .Select(i => new {
+            Id = i.Id,
+            DisplayName = $"{(i.Premises != null ? i.Premises.Name : "Unknown")} - {i.InspectionDate:dd/MM/yyyy}"
+        }).ToList();
+            ViewBag.InspectionId = new Microsoft.AspNetCore.Mvc.Rendering.SelectList(inspections, "Id", "DisplayName");
 
             return View(followUp);
         }
