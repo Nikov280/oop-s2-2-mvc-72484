@@ -29,6 +29,7 @@ namespace FoodSafety.MVC.Controllers
             var followUps = await _context.FollowUps
                 .Include(f => f.Inspection)
                     .ThenInclude(i => i.Premises)
+                    .OrderByDescending(f => f.DueDate)
                 .Select(f => new FollowUpIndexViewModel
                 {
                     Id = f.Id,
@@ -42,8 +43,7 @@ namespace FoodSafety.MVC.Controllers
                     ClosedDate = f.ClosedDate,
                     InspectionId = f.InspectionId
                 })
-                .Take(10)
-                .OrderByDescending(f => f.DueDate)
+                .Take(10)                
                 .ToListAsync();
 
             return View(followUps);

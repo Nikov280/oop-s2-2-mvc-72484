@@ -26,6 +26,7 @@ namespace FoodSafety.MVC.Controllers
         }
 
         // GET: Inspections
+        [Authorize(Roles = "Inspector,Admin,Viewer")]
         public async Task<IActionResult> Index()
         {
             var applicationDbContext = _context.Inspections.Include(i => i.Premises);
@@ -33,6 +34,7 @@ namespace FoodSafety.MVC.Controllers
         }
 
         // GET: Inspections/Details/5
+        [Authorize(Roles = "Inspector,Admin,Viewer")]
         public async Task<IActionResult> Details(int? id)
         {
             if (id == null)
@@ -69,9 +71,10 @@ namespace FoodSafety.MVC.Controllers
 
                 if (inspection.InspectionDate > DateTime.Now)
                 {
-                    _logger.LogWarning("Invalid InspectionDate {Date} for Premises {Id}",
+                    _logger.LogWarning("Validation failure: Attempted to create inspection with future date {Date} for Premises {PremisesId}",
                 inspection.InspectionDate, inspection.PremisesId);
-                    return View(inspection);
+
+                    ModelState.AddModelError("InspectionDate", "The inspection date cannot be in the future..");
                 }
 
                 if (ModelState.IsValid)

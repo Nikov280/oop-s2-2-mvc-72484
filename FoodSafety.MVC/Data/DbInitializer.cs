@@ -128,6 +128,7 @@ public static async Task SeedRolesAndAdmin(IServiceProvider serviceProvider)
 
         // 1. Create Roles if they do not exist in the AspNetRoles table
         string[] roleNames = { "Admin", "Inspector", "Viewer" };
+
         foreach (var roleName in roleNames)
         {
                 if (!await roleManager.RoleExistsAsync(roleName))
