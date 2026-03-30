@@ -75,10 +75,9 @@
         </div>
     </div>
 
-    <div class="mt-5 p-3 bg-white border rounded shadow-sm">
-        <p class="mb-0 text-muted">
-            <i class="bi bi-info-circle"></i>
-            <strong>Audit Trail:</strong> All actions on this dashboard are being logged to <code>/Logs</code> via Serilog.
-        </p>
+    <div class="alert alert-light border shadow-sm">
+        <i class="bi bi-info-circle"></i>
+        <strong>Audit Trail:</strong> All actions on this dashboard are being logged to
+        <a asp-controller="Logs" asp-action="Index" class="text-primary fw-bold">/Logs</a> via Serilog.
     </div>
 </div>

@@ -1,56 +1,65 @@
 ﻿@model FoodSafety.Domain.Entities.Inspection
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Edit Inspection";
 }
 
-<h1>Edit</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card shadow border-0">
+                <div class="card-header bg-primary text-white py-3">
+                    <h3 class="mb-0"><i class="bi bi-pencil-square me-2"></i>Edit Inspection</h3>
+                </div>
+                <div class="card-body p-4">
+                    <form asp-action="Edit">
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+                        <input type="hidden" asp-for="Id" />
 
-<h4>Inspection</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="Edit">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Id" />
-            <div class="form-group">
-                <label asp-for="PremisesId" class="control-label"></label>
-                <select asp-for="PremisesId" class="form-control" asp-items="ViewBag.PremisesId"></select>
-                <span asp-validation-for="PremisesId" class="text-danger"></span>
+                        <div class="mb-3">
+                            <label asp-for="PremisesId" class="form-label text-muted fw-bold">Premises</label>
+                            <select asp-for="PremisesId" class="form-select shadow-sm" asp-items="ViewBag.PremisesId"></select>
+                            <span asp-validation-for="PremisesId" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="InspectionDate" class="form-label text-muted fw-bold">Inspection Date</label>
+                            <input asp-for="InspectionDate" class="form-control shadow-sm" type="date" />
+                            <span asp-validation-for="InspectionDate" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Score" class="form-label text-muted fw-bold">Score (0-100)</label>
+                                <input asp-for="Score" class="form-control shadow-sm" />
+                                <span asp-validation-for="Score" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Outcome" class="form-label text-muted fw-bold">Outcome</label>
+                                <select asp-for="Outcome" class="form-select shadow-sm" asp-items="Html.GetEnumSelectList<FoodSafety.Domain.Enums.Outcome>()"></select>
+                                <span asp-validation-for="Outcome" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="Notes" class="form-label text-muted fw-bold">Inspection Notes</label>
+                            <textarea asp-for="Notes" class="form-control shadow-sm" rows="3" placeholder="Enter findings..."></textarea>
+                            <span asp-validation-for="Notes" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end border-top pt-3">
+                            <a asp-action="Index" class="btn btn-outline-secondary px-4 me-md-2">Cancel</a>
+                            <button type="submit" class="btn btn-primary px-5 shadow-sm">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="InspectionDate" class="control-label"></label>
-                <input asp-for="InspectionDate" class="form-control" />
-                <span asp-validation-for="InspectionDate" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Score" class="control-label"></label>
-                <input asp-for="Score" class="form-control" />
-                <span asp-validation-for="Score" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Outcome" class="control-label"></label>
-                <select asp-for="Outcome" class="form-select"
-                        asp-items="Html.GetEnumSelectList<FoodSafety.Domain.Enums.Outcome>()">
-                </select>
-                <span asp-validation-for="Outcome" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Notes" class="control-label"></label>
-                <input asp-for="Notes" class="form-control" />
-                <span asp-validation-for="Notes" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

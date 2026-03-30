@@ -1,42 +1,65 @@
 ﻿@model FoodSafety.Domain.Entities.FollowUp
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Follow-Up Details";
 }
 
-<h1>Details</h1>
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-7">
+            <div class="card shadow border-0">
+                <div class="card-header bg-dark text-white py-3">
+                    <h3 class="mb-0"><i class="bi bi-clock-history me-2"></i>Follow-Up Record</h3>
+                </div>
+                <div class="card-body p-4">
+                    <div class="row mb-4">
+                        <div class="col-sm-6">
+                            <h6 class="text-muted text-uppercase small fw-bold">Inspection Reference</h6>
+                            <p class="fs-5">
+                                @Model.Inspection?.Premises?.Name <br />
+                                <small class="text-muted">Date: @Model.Inspection?.InspectionDate.ToString("dd/MM/yyyy")</small>
+                            </p>
+                        </div>
+                        <div class="col-sm-6 text-sm-end">
+                            <h6 class="text-muted text-uppercase small fw-bold">Current Status</h6>
+                            @if (Model.Status == "Open")
+                            {
+                                <span class="badge bg-warning text-dark fs-6 px-3">OPEN</span>
+                            }
+                            else
+                            {
+                                <span class="badge bg-success fs-6 px-3">CLOSED</span>
+                            }
+                        </div>
+                    </div>
 
-<div>
-    <h4>FollowUp</h4>
-    <hr />
-    <dl class="row">
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Inspection)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Inspection.Notes)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.DueDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.DueDate)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.Status)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.Status)
-        </dd>
-        <dt class = "col-sm-2">
-            @Html.DisplayNameFor(model => model.ClosedDate)
-        </dt>
-        <dd class = "col-sm-10">
-            @Html.DisplayFor(model => model.ClosedDate)
-        </dd>
-    </dl>
-</div>
-<div>
-    <a asp-action="Edit" asp-route-id="@Model?.Id">Edit</a> |
-    <a asp-action="Index">Back to List</a>
+                    <hr />
+
+                    <dl class="row mt-4">
+                        <dt class="col-sm-4 text-muted">Due Date</dt>
+                        <dd class="col-sm-8 fw-bold text-primary">@Model.DueDate.ToString("dd/MM/yyyy HH:mm")</dd>
+
+                        <dt class="col-sm-4 text-muted">Closed Date</dt>
+                        <dd class="col-sm-8">
+                            @(Model.ClosedDate.HasValue? Model.ClosedDate.Value.ToString("dd/MM/yyyy HH:mm") : "—")
+                        </dd>
+                    </dl>
+                </div>
+                <div class="card-footer bg-light py-3 d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-outline-secondary">
+                        <i class="bi bi-list-task"></i> Back to List
+                    </a>
+                    <div class="btn-group">
+                        @if (Model.Status == "Open")
+                        {
+                            <form asp-action="Close" asp-route-id="@Model.Id" method="post" class="me-2">
+                                <button type="submit" class="btn btn-success px-4">Close Task</button>
+                            </form>
+                        }
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-outline-danger">Delete</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>

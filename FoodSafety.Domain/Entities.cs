@@ -4,7 +4,7 @@ using static FoodSafety.Domain.Enums;
 namespace FoodSafety.Domain.Entities;
 
 public class Premises
-{
+{    
     public int Id { get; set; }
     [Required]
     public string Name { get; set; } = string.Empty;
@@ -13,7 +13,7 @@ public class Premises
     public RiskRating RiskRating { get; set; }
 
     // Navigation Property: One Premises has many Inspections
-    public List<Inspection> Inspections { get; set; } = new();
+    public virtual ICollection<Inspection> Inspections { get; set; } = new HashSet<Inspection>();
 }
 
 

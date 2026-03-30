@@ -1,7 +1,10 @@
 using FoodSafety.MVC.Data;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
+//Testing
+using Microsoft.Extensions.FileProviders;
 
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,6 +32,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options => options.SignIn.Requ
     .AddEntityFrameworkStores<ApplicationDbContext>();
 builder.Services.AddControllersWithViews();
 
+
 var app = builder.Build();
 
 app.UseSerilogRequestLogging();
@@ -47,6 +51,14 @@ else
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+
+//Testing
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine(builder.Environment.ContentRootPath, "Logs")),
+    RequestPath = "/Logs"
+});
 
 app.UseRouting();
 
